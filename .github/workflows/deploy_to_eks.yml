@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-      
+
     - name: Set up AWS
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -53,7 +53,7 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-        
+
     - name: Install kubectl
       run: |
         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -62,7 +62,13 @@ jobs:
 
     - name: Deploy to EKS
       run: |
-        # Set the context to your EKS cluster
         aws eks update-kubeconfig --name fiapapp
-        # Update the Kubernetes deployment to use the new image
-        kubectl set image deployment/api-deployment fiap-api-app=${{ steps.build-push.outputs.image }}
+        # Check if the deployment exists
+        if ! kubectl get deployment api-deployment; then
+          # TODO: Create the deployment. You might need to use a manifest file or some commands here to define your deployment.
+          echo "Deployment doesn't exist. Creating it..."
+          kubectl create deployment api-deployment --image=${{ steps.build-push.outputs.image }}
+        else
+          echo "Updating deployment image..."
+          kubectl set image deployment/api-deployment fiap-api-app=${{ steps.build-push.outputs.image }}
+        fi
