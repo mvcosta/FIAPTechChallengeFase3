@@ -17,11 +17,11 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: <your-aws-region>
+        aws-region: us-east-1
 
     - name: Create ECR repository if not exists
       env:
-        ECR_REPOSITORY: <your-repository-name>
+        ECR_REPOSITORY: fiap-api-app
       run: |
         aws ecr describe-repositories --repository-names $ECR_REPOSITORY || aws ecr create-repository --repository-name $ECR_REPOSITORY
 
@@ -32,8 +32,8 @@ jobs:
     - name: Build and push Docker image to ECR
       id: build-push
       env:
-        ECR_REGISTRY: <your-ecr-registry-url> # exemplo: 123456789012.dkr.ecr.us-west-1.amazonaws.com
-        ECR_REPOSITORY: <your-repository-name>
+        ECR_REGISTRY: 275231002017.dkr.ecr.us-east-1.amazonaws.com
+        ECR_REPOSITORY: fiap-api-app
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -52,7 +52,7 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: <your-aws-region>
+        aws-region: us-east-1
         
     - name: Install kubectl
       run: |
@@ -63,6 +63,6 @@ jobs:
     - name: Deploy to EKS
       run: |
         # Set the context to your EKS cluster
-        aws eks update-kubeconfig --name <your-eks-cluster-name>
+        aws eks update-kubeconfig --name fiapapp
         # Update the Kubernetes deployment to use the new image
-        kubectl set image deployment/<your-deployment-name> <your-container-name>=${{ steps.build-push.outputs.image }}
+        kubectl set image deployment/api-deployment fiap-api-app=${{ steps.build-push.outputs.image }}
