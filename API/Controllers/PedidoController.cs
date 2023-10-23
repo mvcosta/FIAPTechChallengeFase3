@@ -1,4 +1,5 @@
 ﻿using API.Validation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
 
@@ -14,6 +15,17 @@ namespace API.Controllers
         {
             this._pedidoUseCase = pedidoUseCase;
         }
+
+        /// <summary>
+        /// Retorna status 200 se o usuário estiver autenticado
+        /// </summary>
+        /// <response code="200" >Autenticado</response>
+        /// <response code="401" >Não autorizado</response>
+        [HttpGet]
+        [Route("authenticated")]
+        [Authorize]
+        public string Authenticated() => $"Autenticado como: {this.User.Identity.Name}";
+
 
         /// <summary>
         /// Lista todos os pedidos ordenados em Pronto > Em Preparação > Recebido e Data do Pedido. Pedidos Finalizados não são exibidos neste end-point
@@ -43,10 +55,12 @@ namespace API.Controllers
         /// </summary>
         /// <param name="pedido">Dados do pedido</param>
         /// <response code="400" >Dados de cliente ou produtos inválidos</response>
+        /// <response code="401" >Não autorizado</response>
         [HttpPost]
         [Route("order")]
         [CustonValidateModel]
         [ProducesResponseType(typeof(Validation.CustonValidationResultModel), 400)]
+        [Authorize]
         public ActionResult<Application.DTOs.Output.PedidoIdentificador> CreateOrder(Application.DTOs.Imput.Pedido pedido)
         {
             try

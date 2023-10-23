@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Application.DTOs.Imput
 {
@@ -7,6 +8,7 @@ namespace Application.DTOs.Imput
         /// <summary>
         /// Id do cliente. Deixar null caso queira que o pedido seja feito em modo anônimo
         /// </summary>
+        [JsonIgnore]
         public int? ClienteId { get; set; }
         /// <summary>
         /// Observação do cliente
