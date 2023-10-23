@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  labels:
+    app: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+        - name: app-container
+          image: mvcosta/fiap-app
+          ports:
+            - containerPort: 80
+          env:
+            - name: POSTGRE_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: fiap-opaque
+                  key: POSTGRE_CONNECTION_STRING
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-service
+spec:
+  selector:
+    app: app
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 31300
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  POSTGRE_CONNECTION_STRING: "User ID=postgres;Password=admin;Host=db-service;Port=5432;Database=Fiap;"

@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+        - name: db-container
+          image: mvcosta/fiap-db
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: fiap-opaque
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fiap-opaque
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: db-config
+                  key: POSTGRES_DB
+      volumes:
+        - name: db-data
+          hostPath:
+            path: /home/mv/code/FIAP/FIAPTechChallenge/data/db
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  selector:
+    app: db
+  ports:
+    - name: postgres
+      protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-config
+data:
+  POSTGRES_DB: Fiap
