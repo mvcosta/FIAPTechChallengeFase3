@@ -40,10 +40,3 @@ spec:
       targetPort: 80
       nodePort: 31300
   type: LoadBalancer
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: app-config
-data:
-  POSTGRE_CONNECTION_STRING: "User ID=postgres;Password=admin;Host=db-service;Port=5432;Database=Fiap;"
