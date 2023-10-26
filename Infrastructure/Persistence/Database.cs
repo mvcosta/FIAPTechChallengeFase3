@@ -17,5 +17,10 @@ namespace Infrastructure.Persistence
         {
             return new NpgsqlConnection(Settings.PostgreSQLConnectionString);
         }
+
+        public static NpgsqlCommand Command(string script, NpgsqlConnection connection)
+        {
+            return new NpgsqlCommand(script, connection);
+        }
     }
 }

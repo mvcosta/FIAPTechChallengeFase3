@@ -38,6 +38,19 @@ namespace API
             //Cria o WebApplication e roda
             var app = builder.Build();
             ConfigApp(app);
+
+            var _connPg = Infrastructure.Persistence.Database.Connection();
+
+            var filePath = Path.GetFullPath(@"./Fiap.sql");
+
+            FileInfo file = new FileInfo(filePath);
+            string script = file.OpenText().ReadToEnd();
+            var db_cmd = Infrastructure.Persistence.Database.Command(script, _connPg);
+
+            _connPg.Open();
+            db_cmd.ExecuteNonQuery();
+            _connPg.Close();
+
             app.Run();
         }
 
@@ -62,14 +75,14 @@ namespace API
             builder.Services.AddHealthChecks();
             builder.Services.AddCors();
 
-            //Configurações de localização
+            //Configuraï¿½ï¿½es de localizaï¿½ï¿½o
             builder.Services.Configure<RequestLocalizationOptions>(options =>
             {
                 options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("pt-BR");
                 options.SupportedCultures = new List<CultureInfo> { new CultureInfo("pt-BR") };
             });
 
-            //Configurações de compressão do json
+            //Configuraï¿½ï¿½es de compressï¿½o do json
             builder.Services.Configure<GzipCompressionProviderOptions>(options => options.Level = CompressionLevel.Optimal);
             builder.Services.AddResponseCompression(options =>
             {
@@ -85,7 +98,7 @@ namespace API
             });
 
 
-            //Suprime a validação auto dos models permitindo que seja feita uma validação manual
+            //Suprime a validaï¿½ï¿½o auto dos models permitindo que seja feita uma validaï¿½ï¿½o manual
             builder.Services.Configure<ApiBehaviorOptions>(options =>
             {
                 options.SuppressModelStateInvalidFilter = true;
@@ -120,7 +133,7 @@ namespace API
         }
 
         /// <summary>
-        /// Configurações gerais
+        /// Configuraï¿½ï¿½es gerais
         /// </summary>
         static void StartConfigs()
         {
@@ -176,7 +189,7 @@ namespace API
                 {
                     Description =
                    "JWT Authorization Header - utilizado com Bearer Authentication.\r\n\r\n" +
-                   "Digite 'Bearer' [espaço] e então seu token no campo abaixo.\r\n\r\n" +
+                   "Digite 'Bearer' [espaï¿½o] e entï¿½o seu token no campo abaixo.\r\n\r\n" +
                    "Exemplo (informar sem as aspas): 'Bearer 12345abcdef'",
                     Name = "Authorization",
                     In = ParameterLocation.Header,
