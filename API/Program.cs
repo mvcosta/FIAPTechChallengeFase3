@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Xml.Linq;
+using Dapper;
 
 namespace API
 {
@@ -38,20 +39,20 @@ namespace API
             //Cria o WebApplication e roda
             var app = builder.Build();
             ConfigApp(app);
+            RunSQLScript();
+            app.Run();
+        }
 
+        static void RunSQLScript()
+        {
             var _connPg = Infrastructure.Persistence.Database.Connection();
-
             var filePath = Path.GetFullPath(@"./Fiap.sql");
-
             FileInfo file = new FileInfo(filePath);
             string script = file.OpenText().ReadToEnd();
             var db_cmd = Infrastructure.Persistence.Database.Command(script, _connPg);
-
             _connPg.Open();
             db_cmd.ExecuteNonQuery();
             _connPg.Close();
-
-            app.Run();
         }
 
         static void ConfigBuilder(WebApplicationBuilder builder)

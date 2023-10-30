@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -16,15 +17,21 @@ namespace API.Controllers
             this._pedidoUseCase = pedidoUseCase;
         }
 
-        /// <summary>
-        /// Retorna status 200 se o usuário estiver autenticado
-        /// </summary>
-        /// <response code="200" >Autenticado</response>
-        /// <response code="401" >Não autorizado</response>
-        [HttpGet]
-        [Route("authenticated")]
-        [Authorize]
-        public string Authenticated() => $"Autenticado como: {this.User.Identity.Name}";
+        ///// <summary>
+        ///// Retorna status 200 se o usuário estiver autenticado
+        ///// </summary>
+        ///// <response code="200" >Autenticado</response>
+        ///// <response code="401" >Não autorizado</response>
+        //[HttpGet]
+        //[Route("authenticated")]
+        //[Authorize]
+        //public ActionResult Authenticated()
+        //{
+        //    int? authenticatedUserId = this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier") == null ? null : (int?)Convert.ToInt32(this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+
+
+        //    return Ok($"Autenticado como: {this.User.Identity.Name}");
+        //}
 
 
         /// <summary>
@@ -65,6 +72,10 @@ namespace API.Controllers
         {
             try
             {
+                //Pega o id do cliente
+                if (this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier") != null)
+                    pedido.ClienteId = Convert.ToInt32(this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+
                 var sucess = _pedidoUseCase.Order(pedido);
                 return Ok(sucess);
             }
