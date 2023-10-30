@@ -5,7 +5,7 @@ metadata:
   labels:
     app: app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: app
@@ -25,18 +25,15 @@ spec:
                 secretKeyRef:
                   name: fiap-opaque
                   key: POSTGRE_CONNECTION_STRING
+            - name: ASPNETCORE_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: ASPNETCORE_ENVIRONMENT
 ---
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: app-service
-spec:
-  selector:
-    app: app
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 80
-      nodePort: 31300
-  type: LoadBalancer
+  name: app-config
+data:
+  ASPNETCORE_ENVIRONMENT: "DEVELOPMENT"
