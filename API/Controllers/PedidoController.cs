@@ -73,7 +73,7 @@ namespace API.Controllers
             try
             {
                 //Pega o id do cliente
-                if (this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier") != null)
+                if (!string.IsNullOrEmpty(this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")))
                     pedido.ClienteId = Convert.ToInt32(this.User.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
 
                 var sucess = _pedidoUseCase.Order(pedido);
