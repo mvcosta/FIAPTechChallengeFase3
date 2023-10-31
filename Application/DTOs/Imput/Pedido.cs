@@ -13,7 +13,7 @@ namespace Application.DTOs.Imput
         /// <summary>
         /// Observação do cliente
         /// </summary>
-        public string ClienteObservacao { get; set; }
+        public string ClienteObservacao { get; set; } = string.Empty;
 
         /// <summary>
         /// Itens do pedido
